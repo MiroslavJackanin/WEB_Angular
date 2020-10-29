@@ -1,36 +1,71 @@
 import { Injectable } from '@angular/core';
 import {User} from '../entities/user';
-import {Observable, of, throwError} from 'rxjs';
+import {EMPTY, Observable, of, Subscriber} from 'rxjs';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 import {Auth} from '../entities/auth';
+import {MessageService} from './message.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
-  private users = [
-    new User('Miro', 'miro@mail.com', 1),
-    new User('Marienka', 'marienka@mail.com', 2),
-    new User('Jožko', 'jožko@mail.com', 3)];
+  private users = [new User('Miro', 'miro@mail.com', 1)];
   private serverUrl = 'http://localhost:8080/';
-  private token: string = null;
+  private loggedUserSubscriber: Subscriber<string>;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
-  login(auth: Auth): Observable<boolean> {
+  set token(value: string) {
+    if (value) {
+      localStorage.setItem('token', value);
+    }else {
+      localStorage.removeItem('token');
+    }
+  }
+
+  set user(value: string){
+    this.loggedUserSubscriber.next(value);
+    if (value){
+      localStorage.setItem('user', value);
+    }else {
+      localStorage.removeItem('user');
+    }
+  }
+
+  get user(): string {
+    return localStorage.getItem('user');
+  }
+
+  get token(): string {
+    return localStorage.getItem('token');
+  }
+
+  getUserObservable(): Observable<string> {
+    return new Observable(subscriber => {
+      this.loggedUserSubscriber = subscriber;
+      subscriber.next(this.user);
+    });
+  }
+
+  login(auth: Auth): Observable<boolean | void> {
     return this.http.post(this.serverUrl + 'login', auth, {responseType: 'text'}).pipe(
       map(token => {
         this.token = token;
+        this.user = auth.name;
+        this.messageService.showMessage('Welcome ' + auth.name + '. Login successful', false);
         return true;
       }),
       catchError(error => {
-        if (error instanceof HttpErrorResponse && error.status === 401){
-          return of(false);
-        }
-        return throwError(error);
+        this.logout();
+        return this.processHttpError(error);
       })
     );
+  }
+
+  logout(): void {
+    this.token = null;
+    this.user = null;
   }
 
   getUsersSync(): User[] {
@@ -43,17 +78,46 @@ export class UsersService {
 
   getUsers(): Observable<User[]> {
     return this.http.get<Array<any>>(this.serverUrl + 'users').pipe(
-      map(usersFromServer => this.mapToUsers(usersFromServer))
+      map(usersFromServer => this.mapToUsers(usersFromServer),
+      catchError(error => this.processHttpError(error)))
     );
   }
 
   getExtendedUsers(): Observable<User[]> {
     return this.http.get<Array<any>>(this.serverUrl + 'users/' + this.token).pipe(
-      map(usersFromServer => this.mapToUsers(usersFromServer))
+      map(usersFromServer => this.mapToExtendedUsers(usersFromServer),
+      catchError(error => this.processHttpError(error)))
     );
   }
 
   mapToUsers(usersFromServer: Array<any>): User[]{
     return usersFromServer.map(u => new User(u.name, u.email, u.id));
+  }
+
+  mapToExtendedUsers(usersFromServer: Array<any>): User[]{
+    return usersFromServer.map(u => new User(u.name, u.email, u.id, u.lastLogin, u.active, u.groups));
+  }
+
+  processHttpError(error): Observable<void> {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 0) {
+        this.messageService.showMessage('Server unavailable');
+      } else {
+        if (error.status >= 400 && error.status < 500){
+          /*if (error.error.errorMessage) {
+            this.messageService.showMessage(error.error.errorMessage);
+          }else {
+            this.messageService.showMessage(JSON.parse(error.error).errorMessage);
+          }*/
+          this.messageService.showMessage(error.error.errorMessage ? error.error.errorMessage : JSON.parse(error.error).errorMessage);
+        } else {
+          this.messageService.showMessage('Server error: ' + error.message);
+        }
+      }
+    } else {
+      this.messageService.showMessage('Client error: ' + JSON.stringify(error));
+    }
+    console.error('Server error', error);
+    return EMPTY;
   }
 }
