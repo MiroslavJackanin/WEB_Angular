@@ -11,6 +11,7 @@ import {FormsModule} from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar.component';
 import { ExtendedUsersComponent } from './extended-users/extended-users.component';
 import { MessageComponent } from './message/message.component';
+import { UserEditComponent } from './user-edit/user-edit.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { MessageComponent } from './message/message.component';
     PageNotFoundComponent,
     NavbarComponent,
     ExtendedUsersComponent,
-    MessageComponent
+    MessageComponent,
+    UserEditComponent
   ],
   imports: [
     BrowserModule,

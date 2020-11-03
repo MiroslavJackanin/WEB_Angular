@@ -5,6 +5,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 import {Auth} from '../entities/auth';
 import {MessageService} from './message.service';
+import {Group} from '../entities/group';
 
 @Injectable({
   providedIn: 'root'
@@ -95,7 +96,19 @@ export class UsersService {
   }
 
   mapToExtendedUsers(usersFromServer: Array<any>): User[]{
-    return usersFromServer.map(u => new User(u.name, u.email, u.id, u.lastLogin, u.active, u.groups));
+    return usersFromServer.map(u => User.clone(u));
+  }
+
+  saveUser(user: User): Observable<void | User> {
+    return this.http.post<User>(this.serverUrl + 'users/' + this.token, user).pipe(
+      map(usersFromServer => User.clone(usersFromServer)),
+      catchError(error => this.processHttpError(error))
+    );
+  }
+
+  getGroups(): Observable<Group[] | void> {
+    return this.http.get<Group[]>(this.serverUrl + 'groups/').pipe(
+      catchError(error => this.processHttpError(error)));
   }
 
   processHttpError(error): Observable<void> {

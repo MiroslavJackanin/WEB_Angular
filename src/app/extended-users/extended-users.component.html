@@ -20,3 +20,8 @@
     </tr>
   </tbody>
 </table>
+
+<button type="button" class="btn btn-primary" (click)="onNewUserButtonClick()">
+  Add user
+</button>
+<app-user-edit [user]="editedUser" [actionWithUser]="actionWithUser" (saved)="saveUser($event)"></app-user-edit>
