@@ -106,6 +106,12 @@ export class UsersService {
     );
   }
 
+  deleteUser(user: User) {
+    return this.http.delete(this.serverUrl + 'user/' + user.id + '/' + this.token).pipe(
+      map(_ => true),
+      catchError(error => this.processHttpError(error)));
+  }
+
   getGroups(): Observable<Group[] | void> {
     return this.http.get<Group[]>(this.serverUrl + 'groups/').pipe(
       catchError(error => this.processHttpError(error)));

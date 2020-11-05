@@ -14,9 +14,26 @@
       <td>{{user.id}}</td>
       <td>{{user.name}}</td>
       <td>{{user.email}}</td>
-      <td>{{user.lastLogin}}</td>
-      <td>{{user.active}}</td>
-      <td>{{user.groups}}</td>
+      <td>{{user.getFormatLastLogin()}}</td>
+      <td *ngIf="user.active; else elseBlock">
+        <fa-icon [icon]="faActive"></fa-icon>
+      </td>
+      <ng-template #elseBlock>
+        <td>
+          <fa-icon [icon]="faInactive"></fa-icon>
+        </td>
+      </ng-template>
+      <td>
+        <span *ngFor="let group of user.groups">{{group.name}}&nbsp;</span>
+      </td>
+      <td>
+        <button type="button" class="btn btn-outline-secondary" (click)="editUser(user)">
+          <fa-icon [icon]="faEdit"></fa-icon>
+        </button>
+        <button type="button" class="btn btn-outline-danger" (click)="deleteUser(user)">
+          <fa-icon [icon]="faDelete" style="color: darkred"></fa-icon>
+        </button>
+      </td>
     </tr>
   </tbody>
 </table>
