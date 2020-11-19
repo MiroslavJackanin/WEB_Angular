@@ -13,6 +13,7 @@ import { ExtendedUsersComponent } from './extended-users/extended-users.componen
 import { MessageComponent } from './message/message.component';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { GroupsModule } from '../modules/groups/groups.module';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    GroupsModule,
     AppRoutingModule
   ],
   providers: [],

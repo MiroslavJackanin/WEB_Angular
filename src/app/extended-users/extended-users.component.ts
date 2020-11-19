@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../services/users.service';
 import { User } from '../entities/user';
-import {faUserTimes, faEdit, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
+import { faUserTimes, faEdit, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 declare var $: any;
 

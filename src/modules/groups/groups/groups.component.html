@@ -1,0 +1,7 @@
+<h1>groups</h1>
+<ul *ngIf="groups">
+  <li *ngFor="let group of groups">
+    <a [routerLink]="['..', 'detail', group.id]">{{group.id}} {{group.name}}</a>
+    &nbsp;<fa-icon style="color: green" [icon]="faEdit" routerLink="../edit/{{group.id}}"></fa-icon>
+  </li>
+</ul>

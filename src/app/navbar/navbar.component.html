@@ -8,8 +8,11 @@
       <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" routerLink="/users">Users</a>
       </li>
-      <li *ngIf="loggedUser" class="nav-item" routerLinkActive="active">
+      <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" routerLink="/extended-users">Extended users</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/groups">Groups</a>
       </li>
     </ul>
     <span class="navbar-text" *ngIf="loggedUser; else elseBlock">

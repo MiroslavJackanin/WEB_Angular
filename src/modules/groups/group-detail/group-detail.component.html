@@ -1,0 +1,13 @@
+<h2 *ngIf="group">group n. {{group.id}}</h2>
+<section *ngIf="group">
+  <p>Group name: {{group.name}}</p>
+  <p>Permissions:</p>
+  <ul>
+    <li *ngFor="let permission of group.permissions">{{permission}}</li>
+  </ul>
+</section>
+<section *ngIf="group">
+  <p><button class="btn btn-primary" routerLink="../../edit/{{group.id}}">Edit group</button></p>
+  <button class="btn btn-primary" [routerLink]="['..', group.id - 1]">Previous group</button>
+  <button class="btn btn-primary" [routerLink]="['..', group.id + 1]">Next group</button>
+</section>

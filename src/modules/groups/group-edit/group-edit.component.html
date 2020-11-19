@@ -1,0 +1,28 @@
+<form *ngIf="group" (ngSubmit)="onSubmit()" #groupForm="ngForm">
+  <div>
+    <h2 *ngIf="groupName">Edit group: {{groupName}}</h2>
+    <h2 *ngIf="!groupName">Add new group</h2>
+    <div class="form-group row">
+      <label for="inputName" class="col-sm-2 col-form-label">Name: </label>
+      <div class="col-sm-5">
+        <input name="name" type="text" class="form-control" id="inputName" placeholder="Insert name"
+               [(ngModel)]="group.name" required #nameModel="ngModel">
+      </div>
+      <div [hidden]="nameModel.valid || nameModel.pristine"
+           class="alert alert-danger col-sm-7 offset-sm-2">Name is required</div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputPermissions" class="col-sm-2 col-form-label">Permissions: </label>
+      <div class="col-sm-9">
+        <input name="permissions" type="text" class="form-control" id="inputPermissions"
+               placeholder="Insert permissions" [(ngModel)]="permString">
+      </div>
+    </div>
+  </div>
+  <div>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Back</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!groupForm.form.valid">Save changes
+    </button>
+  </div>
+</form>

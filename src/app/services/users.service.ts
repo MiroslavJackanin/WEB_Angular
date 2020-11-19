@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import {User} from '../entities/user';
-import {EMPTY, Observable, of, Subscriber} from 'rxjs';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {catchError, map} from 'rxjs/operators';
-import {Auth} from '../entities/auth';
-import {MessageService} from './message.service';
-import {Group} from '../entities/group';
+import { User } from '../entities/user';
+import { EMPTY, Observable, of, Subscriber } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { Auth } from '../entities/auth';
+import { MessageService } from './message.service';
+import { Group } from '../entities/group';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,14 @@ export class UsersService {
   private users = [new User('Miro', 'miro@mail.com', 1)];
   private serverUrl = 'http://localhost:8080/';
   private loggedUserSubscriber: Subscriber<string>;
+  private defaultRedirect = '/extended-users';
+  public redirectAfterLogin;
 
   constructor(private http: HttpClient, private messageService: MessageService) { }
+
+  public setDefaultRedirect(): void {
+    this.redirectAfterLogin = this.defaultRedirect;
+  }
 
   set token(value: string) {
     if (value) {
@@ -117,7 +123,20 @@ export class UsersService {
       catchError(error => this.processHttpError(error)));
   }
 
-  processHttpError(error): Observable<void> {
+  getGroup(groupId: number): Observable<Group> {
+    return this.http.get<Group>(this.serverUrl + 'group/' + groupId).pipe(
+      catchError(error => this.processHttpError(error))
+    );
+  }
+
+  saveGroup(group: Group): Observable<Group> {
+    return this.http.post<Group>(this.serverUrl + 'groups/' + this.token, group).pipe(
+      map(groupsFromServer => Group.clone(groupsFromServer)),
+      catchError(error => this.processHttpError(error))
+    );
+  }
+
+  processHttpError(error){
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0) {
         this.messageService.showMessage('Server unavailable');
